@@ -75,6 +75,27 @@ class Traversals {
         // Get the final shortest paths
         return pathsFromPriors(clients, priors);
     }
+    private static class PairComparator implements Comparator<Pair<Integer,Integer>> {
+        @Override
+        public int compare(Pair<Integer,Integer> a, Pair<Integer,Integer> b){
+            return a.getFirst() - b.getFirst();
+        }
+
+    }
+    static HashMap<Integer,ArrayList<Integer>> Dijkstra_path(Graph graph, ArrayList<Client> clients ,ArrayList<Integer> bandwidths){
+        int[] distance =  new int[graph.size()];
+        int[] previous = new int[graph.size()];
+
+        Arrays.fill(distance,Integer.MAX_VALUE);
+        Arrays.fill(previous,-1);
+
+        distance[graph.contentProvider] = 0;
+
+        PriorityQueue<Pair<Integer,Integer>> pq = new PriorityQueue<>(new PairComparator());
+        pq.offer(new Pair<>(0,graph.contentProvider));
+
+
+    }
 
     /**
      * Helper function to turn prior array to a Map of Paths

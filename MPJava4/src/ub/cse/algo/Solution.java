@@ -1,6 +1,8 @@
 package ub.cse.algo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.PriorityQueue;
 
 public class Solution {
 
@@ -27,12 +29,14 @@ public class Solution {
      *
      * @return SolutionObject containing the paths, priorities and bandwidths
      */
+
     public SolutionObject outputPaths() {
         SolutionObject sol = new SolutionObject();
         /* TODO: Your solution goes here */
-        /*
-        1.Implement Dijkstra to generate our paths, weight can either be our bandwidths or load/bandwidth
-        2.then calculate how many times each node passes through another node, this will give our load vs bandwidth
+
+       // 1.Implement Dijkstra to generate our paths, weight can either be our bandwidths or load/bandwidth
+
+        /*2.then calculate how many times each node passes through another node, this will give our load vs bandwidth
         3.We will then determine if we should increase the bandwidth using the formula, updated - current
             if greater than 0
                 upgrade
