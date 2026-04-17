@@ -117,7 +117,7 @@ class Traversals {
     }
 
 
-    }
+
 
     /**
      * Helper function to turn prior array to a Map of Paths
