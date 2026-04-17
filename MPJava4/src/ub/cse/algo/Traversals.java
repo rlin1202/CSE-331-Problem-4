@@ -102,18 +102,18 @@ class Traversals {
             } else {
                 visited.add(currentNode.getSecond());
 
-                for(Integer neighbor : graph.get(currentNode.getSecond())){
+                for(int neighbor : graph.get(currentNode.getSecond())){
                     int newDistance = currentNode.getFirst() + bandwidths.get(neighbor);
 
                     if(newDistance < distance[neighbor]){
                         distance[neighbor] = newDistance;
                         previous[neighbor] = currentNode.getSecond();
-                        //priorityQueue.offer(...); <--- WORK ON THIS PART
+                        pq.offer(new Pair<>(newDistance,neighbor));
                     }
                 }
             }
         }
-        return null;
+        return pathsFromPriors(clients,previous);
     }
 
 
