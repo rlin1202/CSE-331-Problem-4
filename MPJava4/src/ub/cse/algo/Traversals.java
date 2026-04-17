@@ -92,10 +92,32 @@ class Traversals {
         distance[graph.contentProvider] = 0;
 
         PriorityQueue<Pair<Integer,Integer>> pq = new PriorityQueue<>(new PairComparator());
+        Set<Integer> visited = new HashSet<>();
         pq.offer(new Pair<>(0,graph.contentProvider));
 
+        while(!pq.isEmpty()){
+            Pair<Integer,Integer> currentNode = pq.poll();
+            if(visited.contains(currentNode.getSecond())){
+                continue;
+            } else {
+                visited.add(currentNode.getSecond());
 
+                for(int neighbor : graph.get(currentNode.getSecond())){
+                    int newDistance = currentNode.getFirst() + bandwidths.get(neighbor);
+
+                    if(newDistance < distance[neighbor]){
+                        distance[neighbor] = newDistance;
+                        previous[neighbor] = currentNode.getSecond();
+                        pq.offer(new Pair<>(newDistance,neighbor));
+                    }
+                }
+            }
+        }
+        return pathsFromPriors(clients,previous);
     }
+
+
+
 
     /**
      * Helper function to turn prior array to a Map of Paths
