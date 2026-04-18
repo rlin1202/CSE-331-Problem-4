@@ -32,7 +32,7 @@ public class Solution {
     private static class PairComparator implements Comparator<Pair<Integer,Integer>> {
         @Override
         public int compare(Pair<Integer,Integer> a, Pair<Integer,Integer> b){
-            return Integer.compare(b.getFirst(),a.getFirst());
+            return -b.getFirst() - a.getFirst();
         }
     }
 
@@ -50,6 +50,8 @@ public class Solution {
         int maxBandwidth = Collections.max(bandwidths);
 
         PriorityQueue<Pair<Integer, Integer>> pq = new PriorityQueue<>(new PairComparator());
+        PriorityQueue<Pair<Integer, Integer>> pq_sort = new PriorityQueue<>(new PairComparator());
+
         Set<Integer> visited = new HashSet<>();
         pq.offer(new Pair<>(0, graph.contentProvider));
 
@@ -78,6 +80,11 @@ public class Solution {
                 }
             }
         }
+        //-------------Sorting-------------//
+
+
+
+
 
         HashMap<Integer, ArrayList<Integer>> paths = new HashMap<>(clients.size());
         // For every client, traverse the prior array, creating the path
@@ -117,6 +124,8 @@ public class Solution {
         }
         sol.bandwidths = tempBandwidths;
         //sort deleted since it does absolutely nothing
+
+
         return sol;
     }
 }
