@@ -40,8 +40,6 @@ public class Solution {
         SolutionObject sol = new SolutionObject();
         /* TODO: Your solution goes here */
 
-
-        //-------------DIJKSTRA-------------//
         int[] distance = new int[graph.size()];
         int[] previous = new int[graph.size()];
 
@@ -49,6 +47,7 @@ public class Solution {
         Arrays.fill(previous, -1);
 
         distance[graph.contentProvider] = 0;
+        int maxBandwidth = Collections.max(bandwidths);
 
         PriorityQueue<Pair<Integer, Integer>> pq = new PriorityQueue<>(new PairComparator());
         PriorityQueue<Pair<Integer, Integer>> pq_sort = new PriorityQueue<>(new PairComparator());
@@ -64,9 +63,16 @@ public class Solution {
                 visited.add(currentNode.getSecond());
 
                 for (int neighbor : graph.get(currentNode.getSecond())) {
-                    int newDistance = currentNode.getFirst() + bandwidths.get(neighbor);
+                    int weight;
+                    if (neighbor < bandwidths.size()){
+                        weight = maxBandwidth / bandwidths.get(neighbor);
+                    }else{
+                        weight = 1;
+                    }
 
-                    if (newDistance < distance[neighbor]) {
+                    int newDistance = currentNode.getFirst() + weight;
+
+                    if (newDistance < distance[neighbor] && neighbor < distance.length) {
                         distance[neighbor] = newDistance;
                         previous[neighbor] = currentNode.getSecond();
                         pq.offer(new Pair<>(newDistance, neighbor));
@@ -80,51 +86,45 @@ public class Solution {
 
 
 
-        //-------------Paths-Generation-------------//
         HashMap<Integer, ArrayList<Integer>> paths = new HashMap<>(clients.size());
         // For every client, traverse the prior array, creating the path
         for (Client client : clients) {
             ArrayList<Integer> path = new ArrayList<>();
             int currentNode = client.id;
             while (currentNode != -1) {
-                /*
-                    Add this ID to the beginning of the
-                    path so the path ends with the client
-                 */
                 path.add(0, currentNode);
                 currentNode = previous[currentNode];
             }
             paths.put(client.id, path);
         }
         sol.paths = paths;
-        //-------------Bandwidth-------------//
 
-        HashMap<Client,Integer> hashMap = new HashMap<>();
-
-        for(int i = 0; i < graph.size(); i++){
-            for(int j = 0; j < clients.size(); j++){
-                if(graph.get(i).contains(j)){
-                    if(!hashMap.containsKey(clients.get(j))){
-                        hashMap.put(clients.get(j),1);
-                    } else {
-                        Integer val = hashMap.get(clients.get(j));
-                        val += 1;
-                        hashMap.put(clients.get(j),val);
-                    }
-                }
-                if(hashMap.get(clients.get(j)) != null){
-                    if(hashMap.get(clients.get(j)) > bandwidths.get(clients.get(j).id)){
-                        int val = Math.max(0,(bandwidths.get(clients.get(j).id) + 1) - (bandwidths.get(clients.get(j).id)) );
-
-                        if(val > 0){
-                            int oldBandwidth = (bandwidths.get(clients.get(j).id) );
-                            bandwidths.set(clients.get(j).id,oldBandwidth + 1);
-                        }
-                    }
+        //keeps track of packet traffic and router loads
+        int[] load = new int[bandwidths.size()];
+        //get the path for each client
+        for (Client client : clients) {
+            ArrayList<Integer> path = paths.get(client.id);
+            for (int node : path) {
+                if (node < bandwidths.size()) {
+                    //each time we reach a node in the path we keep track of the node and the amount of times it visited
+                    load[node]++;
                 }
             }
         }
-        sol.bandwidths = bandwidths;
+
+        //new bandwidths list to keep track of the bandwidths
+        ArrayList<Integer> tempBandwidths = new ArrayList<>(bandwidths);
+        //if our original bandwidth is lower than the load we just set it to the load
+        for (int node = 0; node < bandwidths.size(); node++) {
+            int required = load[node];
+            int original = bandwidths.get(node);
+            if (required > original) {
+                tempBandwidths.set(node, required);
+            }
+        }
+        sol.bandwidths = tempBandwidths;
+        //sort deleted since it does absolutely nothing
+
 
         return sol;
     }
