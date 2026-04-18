@@ -76,77 +76,77 @@ class Traversals {
         return pathsFromPriors(clients, priors);
     }
 
-    private static class PairComparator implements Comparator<Pair<Integer,Integer>> {
-        @Override
-        public int compare(Pair<Integer,Integer> a, Pair<Integer,Integer> b){
-            return a.getFirst() - b.getFirst();
-        }
-
-    }
-
-
-    static HashMap<Integer,ArrayList<Integer>> Dijkstra_path(Graph graph, ArrayList<Client> clients ,ArrayList<Integer> bandwidths){
-        int[] distance =  new int[graph.size()];
-        int[] previous = new int[graph.size()];
-
-        Arrays.fill(distance,Integer.MAX_VALUE);
-        Arrays.fill(previous,-1);
-
-        distance[graph.contentProvider] = 0;
-
-
-
-
-
-//        //This is running incorrectly!
-//        HashMap<Integer, Pair<Integer,ArrayList<Client>>> nodesatBandwidth = new HashMap<>(); // Key: Node - Value: Clients that contain node
-//        HashMap<Integer, Integer> nodesatBandwidth = new HashMap<>();
+//    private static class PairComparator implements Comparator<Pair<Integer,Integer>> {
+//        @Override
+//        public int compare(Pair<Integer,Integer> a, Pair<Integer,Integer> b){
+//            return a.getFirst() - b.getFirst();
+//        }
 //
-//        for (int i = 0; i < graph.size(); i++) {
-//            ArrayList<Client> inPath = new ArrayList<>();
+//    }
+
+
+//    static HashMap<Integer,ArrayList<Integer>> Dijkstra_path(Graph graph, ArrayList<Client> clients ,ArrayList<Integer> bandwidths){
+//        int[] distance =  new int[graph.size()];
+//        int[] previous = new int[graph.size()];
 //
-//            for (int j = 0; j < clients.size(); j++) {
-//                if (graph.get(i).contains(clients.get(j).id)) {
-//                    inPath.add(clients.get(j));
+//        Arrays.fill(distance,Integer.MAX_VALUE);
+//        Arrays.fill(previous,-1);
+//
+//        distance[graph.contentProvider] = 0;
+//
+//
+//
+//
+//
+////        //This is running incorrectly!
+////        HashMap<Integer, Pair<Integer,ArrayList<Client>>> nodesatBandwidth = new HashMap<>(); // Key: Node - Value: Clients that contain node
+////        HashMap<Integer, Integer> nodesatBandwidth = new HashMap<>();
+////
+////        for (int i = 0; i < graph.size(); i++) {
+////            ArrayList<Client> inPath = new ArrayList<>();
+////
+////            for (int j = 0; j < clients.size(); j++) {
+////                if (graph.get(i).contains(clients.get(j).id)) {
+////                    inPath.add(clients.get(j));
+////                }
+////            }
+//////            nodesatBandwidth.put(i, new Pair<>(inPath.size(),inPath));
+////            nodesatBandwidth.put(i, inPath.size());
+////        }
+//////        System.out.println(nodesatBandwidth);
+//
+//
+//
+//        PriorityQueue<Pair<Integer,Integer>> priorityQueue = new PriorityQueue<>(new PairComparator()); //change from minheap to maxheap
+//        Set<Integer> visited = new HashSet<>();
+////        Collections.reverseOrder()
+//
+//        priorityQueue.offer(new Pair<>(0,graph.contentProvider)); // (distance, node)
+//        System.out.println(graph.contentProvider);
+//
+//
+//        while(!priorityQueue.isEmpty()) {
+//            Pair<Integer, Integer> currentNode = priorityQueue.poll();
+//            if (visited.contains(currentNode.getSecond())) {
+//                continue;
+//
+//            } else {
+//                visited.add(currentNode.getSecond());
+//
+//                for (Integer neighbor : graph.get(currentNode.getSecond())) { //
+//                    int newDistance = currentNode.getFirst() + bandwidths.get(neighbor);
+//
+//                    if (newDistance < distance[neighbor]) {
+//                        distance[neighbor] = newDistance;
+//                        previous[neighbor] = currentNode.getSecond();
+//                        //priorityQueue.offer(...); <--- WORK ON THIS PART
+//                        priorityQueue.offer(new Pair<>(newDistance,neighbor));
+//                    }
 //                }
 //            }
-////            nodesatBandwidth.put(i, new Pair<>(inPath.size(),inPath));
-//            nodesatBandwidth.put(i, inPath.size());
 //        }
-////        System.out.println(nodesatBandwidth);
-
-
-
-        PriorityQueue<Pair<Integer,Integer>> priorityQueue = new PriorityQueue<>(new PairComparator()); //change from minheap to maxheap
-        Set<Integer> visited = new HashSet<>();
-//        Collections.reverseOrder()
-
-        priorityQueue.offer(new Pair<>(0,graph.contentProvider)); // (distance, node)
-        System.out.println(graph.contentProvider);
-
-
-        while(!priorityQueue.isEmpty()) {
-            Pair<Integer, Integer> currentNode = priorityQueue.poll();
-            if (visited.contains(currentNode.getSecond())) {
-                continue;
-
-            } else {
-                visited.add(currentNode.getSecond());
-
-                for (Integer neighbor : graph.get(currentNode.getSecond())) { //
-                    int newDistance = currentNode.getFirst() + bandwidths.get(neighbor);
-
-                    if (newDistance < distance[neighbor]) {
-                        distance[neighbor] = newDistance;
-                        previous[neighbor] = currentNode.getSecond();
-                        //priorityQueue.offer(...); <--- WORK ON THIS PART
-                    }
-                }
-            }
-        }
-
-        return new HashMap<>();
-        }
+//        return pathsFromPriors(clients,previous);
+//    }
 
     /**
      * Helper function to turn prior array to a Map of Paths
@@ -156,7 +156,7 @@ class Traversals {
      * @return Map of Client IDs to an ArrayList representing
      *          the path created from the priors
      */
-    private static HashMap<Integer, ArrayList<Integer>> pathsFromPriors(ArrayList<Client> clients, int[] priors) {
+    public static HashMap<Integer, ArrayList<Integer>> pathsFromPriors(ArrayList<Client> clients, int[] priors) {
         HashMap<Integer, ArrayList<Integer>> paths = new HashMap<>(clients.size());
         // For every client, traverse the prior array, creating the path
         for (Client client : clients) {
