@@ -32,7 +32,7 @@ public class Solution {
     private static class PairComparator implements Comparator<Pair<Integer,Integer>> {
         @Override
         public int compare(Pair<Integer,Integer> a, Pair<Integer,Integer> b){
-            return Integer.compare(b.getFirst(),a.getFirst());
+            return -b.getFirst() - a.getFirst();
         }
     }
 
@@ -51,6 +51,8 @@ public class Solution {
         distance[graph.contentProvider] = 0;
 
         PriorityQueue<Pair<Integer, Integer>> pq = new PriorityQueue<>(new PairComparator());
+        PriorityQueue<Pair<Integer, Integer>> pq_sort = new PriorityQueue<>(new PairComparator());
+
         Set<Integer> visited = new HashSet<>();
         pq.offer(new Pair<>(0, graph.contentProvider));
 
@@ -72,6 +74,11 @@ public class Solution {
                 }
             }
         }
+        //-------------Sorting-------------//
+
+
+
+
 
         //-------------Paths-Generation-------------//
         HashMap<Integer, ArrayList<Integer>> paths = new HashMap<>(clients.size());
@@ -90,6 +97,35 @@ public class Solution {
             paths.put(client.id, path);
         }
         sol.paths = paths;
+        //-------------Bandwidth-------------//
+
+        HashMap<Client,Integer> hashMap = new HashMap<>();
+
+        for(int i = 0; i < graph.size(); i++){
+            for(int j = 0; j < clients.size(); j++){
+                if(graph.get(i).contains(j)){
+                    if(!hashMap.containsKey(clients.get(j))){
+                        hashMap.put(clients.get(j),1);
+                    } else {
+                        Integer val = hashMap.get(clients.get(j));
+                        val += 1;
+                        hashMap.put(clients.get(j),val);
+                    }
+                }
+                if(hashMap.get(clients.get(j)) != null){
+                    if(hashMap.get(clients.get(j)) > bandwidths.get(clients.get(j).id)){
+                        int val = Math.max(0,(bandwidths.get(clients.get(j).id) + 1) - (bandwidths.get(clients.get(j).id)) );
+
+                        if(val > 0){
+                            int oldBandwidth = (bandwidths.get(clients.get(j).id) );
+                            bandwidths.set(clients.get(j).id,oldBandwidth + 1);
+                        }
+                    }
+                }
+            }
+        }
+        sol.bandwidths = bandwidths;
+
         return sol;
     }
 }
