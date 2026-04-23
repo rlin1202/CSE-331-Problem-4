@@ -25,7 +25,7 @@ public class Solution {
     private static class PairComparator implements Comparator<Pair<Integer,Integer>> {
         @Override
         public int compare(Pair<Integer,Integer> a, Pair<Integer,Integer> b){
-            return -a.getFirst() - b.getFirst();
+            return Integer.compare(b.getFirst(),a.getFirst());
         }
     }
 //
