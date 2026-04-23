@@ -76,15 +76,16 @@ class Traversals {
         return pathsFromPriors(clients, priors);
     }
 
-//    private static class PairComparator implements Comparator<Pair<Integer,Integer>> {
-//        @Override
-//        public int compare(Pair<Integer,Integer> a, Pair<Integer,Integer> b){
-//            return a.getFirst() - b.getFirst();
-//        }
+    private static class PairComparator implements Comparator<Pair<Integer,Integer>> {
+        @Override
+        public int compare(Pair<Integer,Integer> a, Pair<Integer,Integer> b){
+            return Integer.compare(b.getFirst(), a.getFirst());
+        }
+
+    }
+
+
 //
-//    }
-
-
 //    static HashMap<Integer,ArrayList<Integer>> Dijkstra_path(Graph graph, ArrayList<Client> clients ,ArrayList<Integer> bandwidths){
 //        int[] distance =  new int[graph.size()];
 //        int[] previous = new int[graph.size()];
@@ -98,34 +99,36 @@ class Traversals {
 //
 //
 //
-////        //This is running incorrectly!
-////        HashMap<Integer, Pair<Integer,ArrayList<Client>>> nodesatBandwidth = new HashMap<>(); // Key: Node - Value: Clients that contain node
-////        HashMap<Integer, Integer> nodesatBandwidth = new HashMap<>();
-////
-////        for (int i = 0; i < graph.size(); i++) {
-////            ArrayList<Client> inPath = new ArrayList<>();
-////
-////            for (int j = 0; j < clients.size(); j++) {
-////                if (graph.get(i).contains(clients.get(j).id)) {
-////                    inPath.add(clients.get(j));
-////                }
-////            }
-//////            nodesatBandwidth.put(i, new Pair<>(inPath.size(),inPath));
-////            nodesatBandwidth.put(i, inPath.size());
-////        }
-//////        System.out.println(nodesatBandwidth);
+//        //This is running incorrectly!
+//        HashMap<Integer, Pair<Integer,ArrayList<Client>>> nodesatBandwidth = new HashMap<>(); // Key: Node - Value: Clients that contain node
+//        HashMap<Integer, Integer> nodesatBandwidth = new HashMap<>();
+//
+//        for (int i = 0; i < graph.size(); i++) {
+//            ArrayList<Client> inPath = new ArrayList<>();
+//
+//            for (int j = 0; j < clients.size(); j++) {
+//                if (graph.get(i).contains(clients.get(j).id)) {
+//                    inPath.add(clients.get(j));
+//                }
+//            }
+//            nodesatBandwidth.put(i, new Pair<>(inPath.size(),inPath));
+//            nodesatBandwidth.put(i, inPath.size());
+//        }
+//        System.out.println(nodesatBandwidth);
 //
 //
 //
 //        PriorityQueue<Pair<Integer,Integer>> priorityQueue = new PriorityQueue<>(new PairComparator()); //change from minheap to maxheap
 //        Set<Integer> visited = new HashSet<>();
-////        Collections.reverseOrder()
+//
+//
 //
 //        priorityQueue.offer(new Pair<>(0,graph.contentProvider)); // (distance, node)
 //        System.out.println(graph.contentProvider);
 //
 //
 //        while(!priorityQueue.isEmpty()) {
+//
 //            Pair<Integer, Integer> currentNode = priorityQueue.poll();
 //            if (visited.contains(currentNode.getSecond())) {
 //                continue;
