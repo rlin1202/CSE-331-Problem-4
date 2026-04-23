@@ -84,7 +84,6 @@ public class Solution {
 
 
 
-
         // 1.Implement Dijkstra to generate our paths, weight can either be our bandwidths or load/bandwidth
 //        sol.paths = Traversals.Dijkstra_path(graph,clients,sol.bandwidths);
 
