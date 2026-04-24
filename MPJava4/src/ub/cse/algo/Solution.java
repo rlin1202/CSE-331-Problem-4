@@ -49,44 +49,81 @@ public class Solution {
 
 //        sol.paths = bfsPaths(graph,clients);
 
-        // 1.Implement Dijkstra to generate our paths, weight can either be our bandwidths or load/bandwidth
-        // 2.sol.paths = Traversals.Dijkstra_path(graph,clients,sol.bandwidths);
+        //Use normal bfs
+        // use a conditional to tell if we should pop a node from the queue or not
 
-//        //-------------DIJKSTRA-------------//
-        int[] distance = new int[graph.size()];
-        int[] previous = new int[graph.size()];
+        int[] priors = new int[graph.size()];
+        Arrays.fill(priors, -1);
 
-        Arrays.fill(distance, Integer.MAX_VALUE);
-        Arrays.fill(previous, -1);
+        Queue<Integer> searchQueue = new LinkedList<>();
+        searchQueue.add(graph.contentProvider);
 
-        distance[graph.contentProvider] = 0;
+        System.out.println(graph.get(graph.contentProvider));
+        while (!searchQueue.isEmpty()) {
+            int node = searchQueue.poll();
 
-        PriorityQueue<Pair<Integer, Integer>> pq = new PriorityQueue<>(new PairComparator());
-        Set<Integer> visited = new HashSet<>();
-        pq.offer(new Pair<>(0, graph.contentProvider));
 
-        while (!pq.isEmpty()) {
-            Pair<Integer, Integer> currentNode = pq.poll();
-            if (visited.contains(currentNode.getSecond())) {
-                continue;
-            } else {
-                visited.add(currentNode.getSecond());
 
-                for (int neighbor : graph.get(currentNode.getSecond())) {
-                    int newDistance = currentNode.getFirst() + bandwidths.get(neighbor);
 
-                    if (newDistance < distance[neighbor]) {
-                        distance[neighbor] = newDistance;
-                        previous[neighbor] = currentNode.getSecond();
-                        pq.offer(new Pair<>(newDistance, neighbor));
+
+            for (int neighbor : graph.get(node)) {
+                if (priors[neighbor] == -1 && neighbor != graph.contentProvider) {
+                    priors[neighbor] = node;
+                    searchQueue.add(neighbor);
+
+                    if (bandwidths.get(searchQueue.peek()) < 4 /* replace constant with something else to decide wheather a node should upgrade */) {
+                        /*  */
+                        System.out.println("Entered If Statement");
+                        //node = searchQueue.iterator().next();
+                        //Upgrade bandwidth here with some type of calculation
+
                     }
                 }
             }
         }
 
+        // Get the final shortest paths
+//        return pathsFromPriors(clients, priors);
 
 
-        //-------------Paths-Generation-------------//
+        // 1.Implement Dijkstra to generate our paths, weight can either be our bandwidths or load/bandwidth
+        // 2.sol.paths = Traversals.Dijkstra_path(graph,clients,sol.bandwidths);
+
+//        //-------------DIJKSTRA-------------//
+//        int[] distance = new int[graph.size()];
+//        int[] previous = new int[graph.size()];
+//
+//        Arrays.fill(distance, Integer.MAX_VALUE);
+//        Arrays.fill(previous, -1);
+//
+//        distance[graph.contentProvider] = 0;
+//
+//        PriorityQueue<Pair<Integer, Integer>> pq = new PriorityQueue<>(new PairComparator());
+//        Set<Integer> visited = new HashSet<>();
+//        pq.offer(new Pair<>(0, graph.contentProvider));
+//
+//        while (!pq.isEmpty()) {
+//            Pair<Integer, Integer> currentNode = pq.poll();
+//            if (visited.contains(currentNode.getSecond())) {
+//                continue;
+//            } else {
+//                visited.add(currentNode.getSecond());
+//
+//                for (int neighbor : graph.get(currentNode.getSecond())) {
+//                    int newDistance = currentNode.getFirst() + bandwidths.get(neighbor);
+//
+//                    if (newDistance < distance[neighbor]) {
+//                        distance[neighbor] = newDistance;
+//                        previous[neighbor] = currentNode.getSecond();
+//                        pq.offer(new Pair<>(newDistance, neighbor));
+//                    }
+//                }
+//            }
+//        }
+
+
+
+        ////-------------Paths-Generation-------------////
         HashMap<Integer, ArrayList<Integer>> paths = new HashMap<>(clients.size());
         // For every client, traverse the prior array, creating the path
         for (Client client : clients) {
@@ -100,7 +137,7 @@ public class Solution {
                     path so the path ends with the client
                  */
                 path.addFirst(currentNode);
-                currentNode = previous[currentNode];
+                currentNode = priors[currentNode];
             }
 
             paths.put(client.id, path);
@@ -180,7 +217,7 @@ public class Solution {
                         Client listClient = clients.get(i);
                         float delayForCurrentClient = c.alpha * info.shortestDelays.get(c.id);
 
-                        //More beta = more chance to unsub
+                        //More beta = less chance to unsub
                         if (delayForCurrentClient > listClient.alpha * info.shortestDelays.get(listClient.id)){
                             continue;
                         }
@@ -199,7 +236,6 @@ public class Solution {
                         }
                     }
                 }
-
 
         }
 
