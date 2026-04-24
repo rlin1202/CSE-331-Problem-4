@@ -3,6 +3,8 @@ import ub.cse.algo.util.Pair;
 import java.util.*;
 import java.math.*;
 
+import static ub.cse.algo.Traversals.bfsPaths;
+
 public class Solution {
 
     private Info info;
@@ -25,50 +27,10 @@ public class Solution {
     private static class PairComparator implements Comparator<Pair<Integer,Integer>> {
         @Override
         public int compare(Pair<Integer,Integer> a, Pair<Integer,Integer> b){
-            return -a.getFirst() - b.getFirst();
+            return a.getFirst() + b.getFirst();
         }
     }
-//
-//    static HashMap<Integer,ArrayList<Integer>> Dijkstra_path(Graph graph, ArrayList<Client> clients , ArrayList<Integer> bandwidths){
-//        int[] distance =  new int[graph.size()];
-//        int[] previous = new int[graph.size()];
-//
-//        Arrays.fill(distance,Integer.MAX_VALUE);
-//        Arrays.fill(previous,-1);
-//
-//        distance[graph.contentProvider] = 0;
-//
-//
-//        PriorityQueue<Pair<Integer,Integer>> priorityQueue = new PriorityQueue<>(new PairComparator()); //change from minheap to maxheap
-//        Set<Integer> visited = new HashSet<>();
-//        Collections.reverseOrder()
-//
-//        priorityQueue.offer(new Pair<>(0,graph.contentProvider)); // (distance, node)
-//        System.out.println(graph.contentProvider);
-//
-//
-//        while(!priorityQueue.isEmpty()) {
-//            Pair<Integer, Integer> currentNode = priorityQueue.poll();
-//            if (visited.contains(currentNode.getSecond())) {
-//                continue;
-//
-//            } else {
-//                visited.add(currentNode.getSecond());
-//
-//                for (Integer neighbor : graph.get(currentNode.getSecond())) { //
-//                    int newDistance = currentNode.getFirst() + bandwidths.get(neighbor);
-//
-//                    if (newDistance < distance[neighbor]) {
-//                        distance[neighbor] = newDistance;
-//                        previous[neighbor] = currentNode.getSecond();
-//                        //priorityQueue.offer(...); <--- WORK ON THIS PART
-//                        priorityQueue.offer(new Pair<>(newDistance,neighbor));
-//                    }
-//                }
-//            }
-//        }
-//        return pathsFromPriors(clients,previous);
-//    }
+
 
 
     /**
@@ -83,11 +45,14 @@ public class Solution {
         /*  Your solution goes here */
 
 
+        //------------------BFS--------------//
+
+//        sol.paths = bfsPaths(graph,clients);
 
         // 1.Implement Dijkstra to generate our paths, weight can either be our bandwidths or load/bandwidth
-//        sol.paths = Traversals.Dijkstra_path(graph,clients,sol.bandwidths);
+        // 2.sol.paths = Traversals.Dijkstra_path(graph,clients,sol.bandwidths);
 
-        //-------------DIJKSTRA-------------//
+//        //-------------DIJKSTRA-------------//
         int[] distance = new int[graph.size()];
         int[] previous = new int[graph.size()];
 
@@ -120,6 +85,7 @@ public class Solution {
         }
 
 
+
         //-------------Paths-Generation-------------//
         HashMap<Integer, ArrayList<Integer>> paths = new HashMap<>(clients.size());
         // For every client, traverse the prior array, creating the path
@@ -133,7 +99,7 @@ public class Solution {
                     Add this ID to the beginning of the
                     path so the path ends with the client
                  */
-                path.add(0, currentNode);
+                path.addFirst(currentNode);
                 currentNode = previous[currentNode];
             }
 
@@ -145,14 +111,15 @@ public class Solution {
 
     //------------------- Upgrading Bandwidth -----------------------//
 
-//        HashMap<Client,Integer> hashMap = new HashMap<>();
+
         HashMap<Integer,Integer> hashMap = new HashMap<>();
 
-        for (int i = 0; i < clients.size(); i++) {
-            Client clientKey = clients.get(i);
 
-            if (sol.paths.get(i) != null) {
-                for (int j = 0; j < sol.paths.get(i).size(); j++) {
+
+                for (int j = 0; j < sol.paths.size(); j++) {
+                    Client clientKey = clients.get(j);
+                    for (int i = 0; i < clients.size(); i++) {
+
 
 
                     if (!hashMap.containsKey(clientKey.id)) {
@@ -168,19 +135,29 @@ public class Solution {
 
                 if (hashMap.get(clientKey.id) != null) {
 
-                    if (hashMap.get(clientKey.id) > bandwidths.get(clientKey.id)) {
-                        int delta = Math.max(0, (bandwidths.get(clientKey.id) + 5) - (bandwidths.get(clientKey.id)));
+                    if (hashMap.get(clientKey.id) > info.bandwidths.get(clientKey.id)) {
+                        int delta = (hashMap.get(clientKey.id)) - (info.bandwidths.get(clientKey.id));
 
                         if (delta > 0) {
-                            bandwidths.set(clientKey.id, bandwidths.get(clientKey.id) + 5);
+                            bandwidths.set(clientKey.id, hashMap.get(clientKey.id)/*info.bandwidths.get(clientKey.id) + 100*/);
                         }
                     }
                 }
-            }
+           // }
         }
+//        System.out.println(hashMap);
+//        System.out.println(info.costBandwidth);
+//        System.out.println(info.bandwidths);
         sol.bandwidths = bandwidths;
 
 
+                //Revenue with bandwidth upgrade +1 = Revenue: 9513885.0
+        //Revenue with bandwidth upgrade +2 = Revenue: 9513885.0
+        //Revenue with bandwidth upgrade +3 = Revenue: 9764676.0
+        //Revenue with bandwidth upgrade +4 = Revenue: 9934770.0
+        //Revenue with bandwidth upgrade +5 = Revenue: 1.0327577E7
+        //Revenue with bandwidth upgrade +10 = Revenue: 1.0793537E7
+        // Revenue with bandwidth upgrade + 30 = Revenue: 1.1251812E7
 
 
         //----------------------- Sorting Priorities of Nodes ---------------------------//
@@ -190,7 +167,6 @@ public class Solution {
         ArrayList<Integer> lowToHighPriority = new ArrayList<>();
         for (Client c : clients) {
 
-            if (sol.paths.containsKey(c.id)){
 
                 if (lowToHighPriority.isEmpty()){
                     lowToHighPriority.add(c.id);
@@ -200,29 +176,28 @@ public class Solution {
                 else{
                     for (int i = 1; i < lowToHighPriority.size() ; i++) {
 
-
-
                         Client listClient = clients.get(i);
+                        float delayForCurrentClient = c.alpha * info.shortestDelays.get(c.id);
 
-                        if (c.payment < listClient.payment){
+                        //More beta = more chance to unsub
+                        if (delayForCurrentClient > listClient.alpha * info.shortestDelays.get(listClient.id)){
                             continue;
                         }
 
-                        if (c.payment > listClient.payment) {
+                        if (delayForCurrentClient < listClient.alpha * info.shortestDelays.get(listClient.id)) {
                             lowToHighPriority.add(c.id);
+                            break;
                         }
 
-                        if (c.payment == listClient.payment){
+
+                        if (delayForCurrentClient == listClient.alpha * info.shortestDelays.get(listClient.id)){
                             if (c.beta > listClient.beta){
                                 lowToHighPriority.add(c.id);
-                            }
-                            else {
-                                lowToHighPriority.add(i +1 ,c.id);
+                                break;
                             }
                         }
                     }
                 }
-            }
 
 
         }
