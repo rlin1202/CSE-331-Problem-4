@@ -29,6 +29,7 @@ public class Solution {
         public int compare(Pair<Integer,Integer> a, Pair<Integer,Integer> b){
             return a.getFirst() + b.getFirst();
         }
+
     }
 
 
@@ -49,8 +50,8 @@ public class Solution {
 
 //        sol.paths = bfsPaths(graph,clients);
 
-        //Use normal bfs
-        // use a conditional to tell if we should pop a node from the queue or not
+//        Use normal bfs
+//         use a conditional to tell if we should pop a node from the queue or not
 
         int[] priors = new int[graph.size()];
         Arrays.fill(priors, -1);
@@ -58,38 +59,28 @@ public class Solution {
         Queue<Integer> searchQueue = new LinkedList<>();
         searchQueue.add(graph.contentProvider);
 
-        System.out.println(graph.get(graph.contentProvider));
+
         while (!searchQueue.isEmpty()) {
             int node = searchQueue.poll();
-
-
-
 
 
             for (int neighbor : graph.get(node)) {
                 if (priors[neighbor] == -1 && neighbor != graph.contentProvider) {
                     priors[neighbor] = node;
-                    searchQueue.add(neighbor);
-
-                    if (bandwidths.get(searchQueue.peek()) < 4 /* replace constant with something else to decide wheather a node should upgrade */) {
-                        /*  */
-                        System.out.println("Entered If Statement");
-                        //node = searchQueue.iterator().next();
-                        //Upgrade bandwidth here with some type of calculation
-
+                    if (bandwidths.get(neighbor) < graph.get(neighbor).size()){
+                        bandwidths.set(neighbor, graph.get(neighbor).size());
                     }
+                    searchQueue.add(neighbor);
                 }
             }
         }
-
-        // Get the final shortest paths
-//        return pathsFromPriors(clients, priors);
 
 
         // 1.Implement Dijkstra to generate our paths, weight can either be our bandwidths or load/bandwidth
         // 2.sol.paths = Traversals.Dijkstra_path(graph,clients,sol.bandwidths);
 
-//        //-------------DIJKSTRA-------------//
+////        //-------------DIJKSTRA-------------//
+//
 //        int[] distance = new int[graph.size()];
 //        int[] previous = new int[graph.size()];
 //
@@ -141,6 +132,7 @@ public class Solution {
             }
 
             paths.put(client.id, path);
+            System.out.println(paths.get(client.id).size() + " " + info.shortestDelays.get(client.id));
 
         }
         sol.paths = paths;
@@ -208,34 +200,84 @@ public class Solution {
 
                 if (lowToHighPriority.isEmpty()){
                     lowToHighPriority.add(c.id);
+                    continue;
                 }
 
-
-                else{
-                    for (int i = 1; i < lowToHighPriority.size() ; i++) {
-
-                        Client listClient = clients.get(i);
-                        float delayForCurrentClient = c.alpha * info.shortestDelays.get(c.id);
-
-                        //More beta = less chance to unsub
-                        if (delayForCurrentClient > listClient.alpha * info.shortestDelays.get(listClient.id)){
+                if (lowToHighPriority.size() == 1){
+                    if (c.isRural){
+                        if (clients.get(lowToHighPriority.getFirst()).alpha < c.alpha){
+                            lowToHighPriority.addLast(c.id);
                             continue;
                         }
 
-                        if (delayForCurrentClient < listClient.alpha * info.shortestDelays.get(listClient.id)) {
-                            lowToHighPriority.add(c.id);
-                            break;
+                        if (clients.get(lowToHighPriority.getFirst()).alpha == c.alpha){
+                           if (clients.get(lowToHighPriority.getFirst()).payment > c.payment){
+                               lowToHighPriority.addLast(c.id);
+                               continue;
+                           }
                         }
 
+                        lowToHighPriority.add(c.id);
+                        continue;
+                    }
+                }
 
-                        if (delayForCurrentClient == listClient.alpha * info.shortestDelays.get(listClient.id)){
-                            if (c.beta > listClient.beta){
-                                lowToHighPriority.add(c.id);
-                                break;
-                            }
+
+            for (int i = 1; i < lowToHighPriority.size(); i++) {
+//                System.out.println("Enters");
+
+                Client listClient = clients.get(i);
+
+                if (c.isRural) {
+                    if (listClient.alpha < c.alpha){
+                        lowToHighPriority.addLast(c.id);
+                        break;
+                    }
+
+                    if (listClient.alpha == c.alpha){
+                        if (listClient.payment > c.payment){
+                            lowToHighPriority.addLast(c.id);
+                            break;
+                        }
+                    }
+
+                    lowToHighPriority.add(c.id);
+                    break;
+                }
+//
+
+                float delayForCurrentClient = c.alpha * info.shortestDelays.get(c.id);
+
+//                More beta = less chance to unsub
+                if (delayForCurrentClient > listClient.alpha * info.shortestDelays.get(listClient.id)) {
+                    if (c.beta < listClient.beta){
+                        lowToHighPriority.add(c.id);
+                        break;
+                    }
+                    continue;
+                }
+
+                if (delayForCurrentClient < listClient.alpha * info.shortestDelays.get(listClient.id)) {
+                    lowToHighPriority.add(c.id);
+                    break;
+                }
+
+
+
+                if (delayForCurrentClient == listClient.alpha * info.shortestDelays.get(listClient.id)) {
+                    if (c.beta < listClient.beta) {
+                        lowToHighPriority.add(c.id);
+                        break;
+                    }
+
+                    if (c.beta == listClient.beta){
+                        if (c.payment > listClient.payment){
+                            lowToHighPriority.add(c.id);
                         }
                     }
                 }
+
+            }
 
         }
 
@@ -243,36 +285,6 @@ public class Solution {
             priorities.put(lowToHighPriority.get(i),i);
         }
         sol.priorities = priorities;
-
-//        for(int i = 0; i < graph.size(); i++){
-//            for(int j = 0; j < clients.size(); j++){
-//
-//                Client clientAsKey = clients.get(j);
-//                if(graph.get(i).contains(j)){
-//
-//                    if(!hashMap.containsKey(clientAsKey)){
-//                        hashMap.put(clientAsKey,1);
-//                    } else {
-//                        Integer val = hashMap.get(clientAsKey);
-//                        val += 1;
-//                        hashMap.put(clientAsKey,val);
-//                    }
-//                }
-//
-//                if(hashMap.get(clientAsKey) != null){
-//                    if(hashMap.get(clientAsKey) > bandwidths.get(clientAsKey.id)){
-//                        int val = Math.max(0,(bandwidths.get(clientAsKey.id) + 5) - (bandwidths.get(clientAsKey.id)) );
-//
-//                        if(val > 0){
-//                            int oldBandwidth = (bandwidths.get(clientAsKey.id) );
-//                            bandwidths.set(clientAsKey.id, bandwidths.get(clientAsKey.id) + 5);
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        sol.bandwidths = bandwidths;
-
 
 
         return sol;
